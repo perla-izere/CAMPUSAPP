@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusCash | Unified Student Transfer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ui-bg: #020617;               
+            --ui-card: #0f172a;             
+            --brand-primary: #3b82f6;       
+            --brand-accent: #8b5cf6;        
+            --text-main: #e2e8f0;           
+            --text-muted: #94a3b8;          
+            --ui-border: #1e293b;           
+            --status-success: #10b981;       
+            --status-danger: #ef4444;        
+            --sidebar-width: 260px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+
+        .hidden { display: none !important; }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--ui-bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Layout Structure */
+        #main-application { display: flex; min-height: 100vh; width: 100%; }
+
+        #navbar {
+            width: var(--sidebar-width);
+            background-color: var(--ui-card);
+            border-right: 1px solid var(--ui-border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        #content-area { flex: 1; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+
+        .card {
+            background-color: var(--ui-card);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--ui-border);
+            margin-bottom: 1.5rem;
+        }
+
+        .card.highlight {
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+            border-left: 4px solid var(--brand-accent);
+        }
+
+        .grid-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--ui-border);
+            background-color: #020617;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.2s;
+        }
+
+        .btn-primary { background-color: var(--brand-primary); color: white; }
+        .btn-danger { background-color: transparent; border: 1px solid var(--status-danger); color: var(--status-danger); }
+        .btn-danger:hover { background-color: var(--status-danger); color: white; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th { text-align: left; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; padding: 1rem; border-bottom: 1px solid var(--ui-border); }
+        td { padding: 1rem; border-bottom: 1px solid var(--ui-border); font-size: 0.9rem; }
+
+        #login-wrapper { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            width: 100vw;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--ui-bg);
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+<div id="login-wrapper">
+    <div class="card" style="max-width: 400px; width: 90%; text-align: center;">
+        <div style="background: var(--brand-accent); width: 50px; height: 50px; border-radius: 12px; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem; color: white;">C</div>
+        <h2 style="margin-bottom: 1rem;">CampusCash</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">Sign in to your student portal</p>
+        <input type="text" id="login-id" placeholder="Email or Student ID">
+        <input type="password" id="login-pass" placeholder="Password">
+        <button onclick="app.login()" class="btn btn-primary">Sign In</button>
+    </div>
+</div>
+
+<div id="main-application" class="hidden">
+    <nav id="navbar">
+        <div>
+            <h3 style="color: var(--brand-accent); margin-bottom: 2rem;">CampusCash</h3>
+            <div id="nav-info">
+                <p id="user-display-name" style="font-weight: 600;"></p>
+                <p id="user-display-role" style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;"></p>
+            </div>
+        </div>
+        <button onclick="app.logout()" class="btn btn-danger">Logout</button>
+    </nav>
+
+    <main id="content-area">
+        <section id="student-dashboard" class="hidden">
+            <h2 style="margin-bottom: 1.5rem;">My Finances</h2>
+            <div class="grid-dashboard">
+                <div class="card">
+                    <h3>Send Money</h3>
+                    <input type="email" id="transfer-email" placeholder="Receiver Email">
+                    <input type="number" id="transfer-amount" placeholder="Amount ($)">
+                    <button onclick="app.handleTransfer()" class="btn btn-primary">Transfer Now</button>
+                </div>
+                <div class="card highlight">
+                    <p style="color: var(--text-muted)">Current Balance</p>
+                    <h1 id="display-balance" style="font-size: 2.5rem; margin: 0.5rem 0;">$0.00</h1>
+                    <p>Total Received: <span id="display-total-received" style="color: var(--status-success)">$0.00</span></p>
+                </div>
+            </div>
+            <div class="card" style="margin-top: 1.5rem;">
+                <h3>Transaction Activity</h3>
+                <table>
+                    <thead><tr><th>Type & Party</th><th>Amount</th><th>Timestamp</th></tr></thead>
+                    <tbody id="receiver-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="admin-dashboard" class="hidden">
+            <h2 style="margin-bottom: 1.5rem;">System Admin</h2>
+            <div class="grid-dashboard">
+                <div class="card">
+                    <p style="color: var(--text-muted)">Revenue (Fees)</p>
+                    <h1 id="admin-total-fees" style="color: var(--brand-primary)">$0.00</h1>
+                </div>
+                <div class="card">
+                    <p style="color: var(--text-muted)">Active Users</p>
+                    <h1 id="admin-user-count">0</h1>
+                </div>
+            </div>
+            <div class="card" style="margin-top: 1.5rem">
+                <h3>System Transaction Ledger</h3>
+                <table>
+                    <thead><tr><th>ID</th><th>Sender</th><th>Receiver</th><th>Amount</th><th>Fee</th></tr></thead>
+                    <tbody id="admin-tx-table-body"></tbody>
+                </table>
+            </div>
+            <div class="card" style="margin-top: 1.5rem; background: #020617;">
+                <h3>Audit Logs</h3>
+                <div id="admin-logs" style="font-family: monospace; font-size: 0.8rem; height: 150px; overflow-y: auto; color: var(--text-muted); margin-top: 10px;"></div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+class CampusCashApp {
+    constructor() {
+        this.initializeData();
+        this.render();
+    }
+
+    initializeData() {
+        const savedData = JSON.parse(localStorage.getItem('campusCash_db'));
+        this.state = savedData || {
+            users: [
+                { name: "Admin User", email: "admin@campus.com", id: "ADMIN001", password: "admin123", role: "admin", balance: 0 },
+                { name: "Alice Johnson", email: "alice@campus.com", id: "STU001", password: "alice123", role: "student", balance: 250 },
+                { name: "Bob Smith", email: "bob@campus.com", id: "STU002", password: "bob123", role: "student", balance: 80 },
+                { name: "Carol Davis", email: "carol@campus.com", id: "STU003", password: "carol123", role: "student", balance: 150 }
+            ],
+            transactions: [],
+            logs: [],
+            currentUser: null
+        };
+    }
+
+    save() { localStorage.setItem('campusCash_db', JSON.stringify(this.state)); }
+
+    log(userId, action, details, status) {
+        this.state.logs.unshift({ timestamp: new Date().toLocaleString(), userId, action, details, status });
+        this.save();
+    }
+
+    login() {
+        const id = document.getElementById('login-id').value;
+        const pass = document.getElementById('login-pass').value;
+        const user = this.state.users.find(u => (u.email === id || u.id === id) && u.password === pass);
+        if (user) {
+            this.state.currentUser = user;
+            this.log(user.id, "LOGIN", "Success", "Success");
+            this.render();
+        } else {
+            alert("Invalid Credentials");
+        }
+    }
+
+    logout() {
+        this.state.currentUser = null;
+        document.getElementById('login-id').value = '';
+        document.getElementById('login-pass').value = '';
+        this.render();
+    }
+
+    handleTransfer() {
+        const email = document.getElementById('transfer-email').value;
+        const amount = parseFloat(document.getElementById('transfer-amount').value);
+        const sender = this.state.currentUser;
+        const receiver = this.state.users.find(u => u.email === email);
+        
+        const fee = (amount <= 10) ? 0.5 : (amount <= 50) ? amount * 0.05 : (amount <= 200) ? amount * 0.04 : Math.min(amount * 0.03, 15);
+        const total = amount + fee;
+
+        if (isNaN(amount) || amount < 1 || !receiver || receiver.email === sender.email || sender.balance < total) {
+            alert("Transfer failed. Check balance/recipient.");
+            this.log(sender.id, "TRANSFER_FAIL", "Invalid Input", "Failure");
+            return;
+        }
+
+        sender.balance -= total;
+        receiver.balance += amount;
+
+        this.state.transactions.push({
+            id: `TXN-${Math.floor(Math.random()*90000)}`,
+            senderName: sender.name, receiverName: receiver.name,
+            amount: amount, fee: fee, timestamp: new Date().toLocaleString()
+        });
+
+        this.log(sender.id, "TRANSFER", `Sent $${amount}`, "Success");
+        this.save();
+        this.render();
+        alert("Sent Successfully!");
+        document.getElementById('transfer-email').value = '';
+        document.getElementById('transfer-amount').value = '';
+    }
+
+    render() {
+        const { currentUser, transactions, users, logs } = this.state;
+        const loginWrapper = document.getElementById('login-wrapper');
+        const mainApp = document.getElementById('main-application');
+
+        // Logic fix: Explicit View Toggling
+        if (!currentUser) {
+            loginWrapper.classList.remove('hidden');
+            mainApp.classList.add('hidden');
+            return;
+        } else {
+            loginWrapper.classList.add('hidden');
+            mainApp.classList.remove('hidden');
+        }
+
+        document.getElementById('user-display-name').innerText = currentUser.name;
+        document.getElementById('user-display-role').innerText = currentUser.role;
+        document.getElementById('student-dashboard').classList.toggle('hidden', currentUser.role !== 'student');
+        document.getElementById('admin-dashboard').classList.toggle('hidden', currentUser.role !== 'admin');
+
+        if (currentUser.role === 'student') {
+            document.getElementById('display-balance').innerText = `$${currentUser.balance.toFixed(2)}`;
+            
+            // SUMMARY: Only money coming in
+            const incomingSum = transactions.filter(t => t.receiverName === currentUser.name).reduce((s, t) => s + t.amount, 0);
+            document.getElementById('display-total-received').innerText = `$${incomingSum.toFixed(2)}`;
+            
+            // HISTORY: All activity (Sent AND Received)
+            const myActivity = transactions.filter(t => t.senderName === currentUser.name || t.receiverName === currentUser.name);
+            const tbody = document.getElementById('receiver-table-body');
+            
+            tbody.innerHTML = myActivity.length === 0 
+                ? `<tr><td colspan="3" style="text-align:center; color:var(--text-muted)">No activity yet.</td></tr>`
+                : myActivity.map(t => {
+                    const isSent = t.senderName === currentUser.name;
+                    return `
+                        <tr>
+                            <td>
+                                <strong>${isSent ? 'Sent' : 'Received'}</strong><br>
+                                <small style="color:var(--text-muted)">${isSent ? 'To: '+t.receiverName : 'From: '+t.senderName}</small>
+                            </td>
+                            <td style="color:${isSent ? 'var(--status-danger)' : 'var(--status-success)'}; font-weight:bold;">
+                                ${isSent ? '-' : '+'}$${t.amount.toFixed(2)}
+                            </td>
+                            <td>${t.timestamp}</td>
+                        </tr>`;
+                }).join('');
+        }
+
+        if (currentUser.role === 'admin') {
+            document.getElementById('admin-total-fees').innerText = `$${transactions.reduce((s, t) => s + t.fee, 0).toFixed(2)}`;
+            document.getElementById('admin-user-count').innerText = users.length - 1;
+            document.getElementById('admin-tx-table-body').innerHTML = transactions.map(t => `<tr><td><small>${t.id}</small></td><td>${t.senderName}</td><td>${t.receiverName}</td><td>$${t.amount.toFixed(2)}</td><td style="color:var(--brand-primary)">$${t.fee.toFixed(2)}</td></tr>`).join('');
+            document.getElementById('admin-logs').innerHTML = logs.map(l => `<div>[${l.timestamp}] ${l.userId}: ${l.action} - ${l.status}</div>`).join('');
+        }
+    }
+}
+const app = new CampusCashApp();
+</script>
+</body>
+</html>
