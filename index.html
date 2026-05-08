@@ -1,333 +1,828 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CampusCash | Unified Student Transfer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --ui-bg: #020617;               
-            --ui-card: #0f172a;             
-            --brand-primary: #3b82f6;       
-            --brand-accent: #8b5cf6;        
-            --text-main: #e2e8f0;           
-            --text-muted: #94a3b8;          
-            --ui-border: #1e293b;           
-            --status-success: #10b981;       
-            --status-danger: #ef4444;        
-            --sidebar-width: 260px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusCash | Student Transfer System</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --border: #e2e8f0;
+  --border2: #cbd5e1;
+  --blue: #2563eb;
+  --blue-dim: #1d4ed8;
+  --purple: #7c3aed;
+  --green: #059669;
+  --red: #dc2626;
+  --yellow: #d97706;
+  --text: #0f172a;
+  --muted: #94a3b8;
+  --muted2: #64748b;
+  --sidebar: 240px;
+  --r: 10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.hidden{display:none!important}
 
-        .hidden { display: none !important; }
+/* AUTH */
+#auth-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;
+  background-image:radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.07) 0%, transparent 50%);}
+.auth-box{width:420px;max-width:95vw;background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:2.5rem;position:relative;overflow:hidden}
+.auth-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--purple))}
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
+.logo-icon{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;color:#fff;flex-shrink:0}
+.auth-logo h2{font-size:1.4rem;font-weight:700;letter-spacing:-0.5px}
+.auth-tabs{display:flex;background:var(--bg);border-radius:8px;padding:4px;margin-bottom:1.5rem;gap:4px}
+.auth-tab{flex:1;padding:.6rem;text-align:center;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:500;color:var(--muted2);transition:.2s;border:none;background:transparent}
+.auth-tab.active{background:var(--surface);color:var(--text);border:1px solid var(--border2);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+label{display:block;font-size:.78rem;font-weight:500;color:var(--muted2);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.5px}
+.inp{width:100%;padding:.7rem 1rem;border:1px solid var(--border2);border-radius:8px;background:var(--bg);color:var(--text);font-family:inherit;font-size:.9rem;margin-bottom:1rem;outline:none;transition:.2s}
+.inp:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.inp::placeholder{color:var(--muted)}
+.btn{padding:.75rem 1.5rem;font-family:inherit;font-weight:600;font-size:.9rem;border-radius:8px;border:none;cursor:pointer;width:100%;transition:.2s;letter-spacing:.2px}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-dim));color:#fff}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--muted2)}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue)}
+.btn-danger{background:transparent;border:1px solid var(--red);color:var(--red);font-size:.8rem;padding:.5rem 1rem}
+.btn-danger:hover{background:var(--red);color:#fff}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.auth-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:.75rem;color:var(--red);font-size:.85rem;margin-bottom:1rem;text-align:center}
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* APP LAYOUT */
+#app-shell{display:flex;min-height:100vh}
+#sidebar{width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);padding:1.25rem;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;flex-shrink:0;box-shadow:2px 0 8px rgba(0,0,0,.04)}
+#main{flex:1;padding:2rem;overflow-y:auto}
+.sidebar-logo{display:flex;align-items:center;gap:10px;margin-bottom:2rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+.sidebar-logo .logo-icon{width:34px;height:34px;font-size:.95rem}
+.sidebar-logo span{font-weight:700;font-size:1.05rem;letter-spacing:-.3px}
+.user-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:1.5rem}
+.user-avatar{width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.95rem;color:#fff;margin-bottom:.6rem}
+.user-name{font-weight:600;font-size:.9rem;margin-bottom:.2rem}
+.user-role{font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted2);padding:.2rem .5rem;background:var(--bg);border-radius:4px;display:inline-block}
+.nav-links{display:flex;flex-direction:column;gap:.25rem;flex:1}
+.nav-link{padding:.65rem .8rem;border-radius:8px;cursor:pointer;font-size:.875rem;font-weight:500;color:var(--muted2);display:flex;align-items:center;gap:.6rem;transition:.15s;border:none;background:transparent;width:100%;text-align:left}
+.nav-link:hover{background:var(--bg);color:var(--text)}
+.nav-link.active{background:rgba(37,99,235,.08);color:var(--blue);border:1px solid rgba(37,99,235,.15)}
+.nav-icon{font-size:1rem;width:18px;text-align:center}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--ui-bg);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+/* PAGE HEADER */
+.page-header{margin-bottom:2rem}
+.page-header h1{font-size:1.6rem;font-weight:700;letter-spacing:-.5px;margin-bottom:.3rem}
+.page-header p{color:var(--muted2);font-size:.875rem}
 
-        /* Layout Structure */
-        #main-application { display: flex; min-height: 100vh; width: 100%; }
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem}
+.card-title{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted2);margin-bottom:.75rem}
+.stat-value{font-size:2rem;font-weight:700;letter-spacing:-1px;line-height:1}
+.stat-label{font-size:.8rem;color:var(--muted2);margin-top:.3rem}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem}
+.card-accent-blue{border-top:3px solid var(--blue)}
+.card-accent-green{border-top:3px solid var(--green)}
+.card-accent-purple{border-top:3px solid var(--purple)}
+.card-accent-yellow{border-top:3px solid var(--yellow)}
 
-        #navbar {
-            width: var(--sidebar-width);
-            background-color: var(--ui-card);
-            border-right: 1px solid var(--ui-border);
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-        }
+/* BALANCE CARD */
+.balance-card{background:linear-gradient(135deg,#1e40af,#2563eb);border:1px solid #1d4ed8;border-radius:var(--r);padding:1.5rem;position:relative;overflow:hidden;color:#fff}
+.balance-card::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%)}
+.balance-amount{font-size:2.6rem;font-weight:700;letter-spacing:-1.5px;margin:.5rem 0;color:#fff}
+.balance-chip{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;padding:.25rem .6rem;border-radius:20px;font-size:.75rem;font-weight:600}
+.card-title{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted2);margin-bottom:.75rem}
 
-        #content-area { flex: 1; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+/* TRANSFER FORM */
+.transfer-form{display:flex;flex-direction:column;gap:.75rem}
+.transfer-form .inp{margin-bottom:0}
+.form-row .inp{margin-bottom:0}
+.fee-preview{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;font-size:.85rem;color:var(--muted2)}
+.fee-row{display:flex;justify-content:space-between;margin-bottom:.3rem}
+.fee-row:last-child{margin-bottom:0;color:var(--text);font-weight:600;border-top:1px solid var(--border);padding-top:.3rem;margin-top:.3rem}
+.fee-row span:last-child{font-family:'DM Mono',monospace}
 
-        .card {
-            background-color: var(--ui-card);
-            padding: 1.5rem;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--ui-border);
-            margin-bottom: 1.5rem;
-        }
+/* TABLES */
+.table-wrap{overflow-x:auto;margin-top:1rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead th{text-align:left;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;padding:.75rem 1rem;border-bottom:1px solid var(--border);font-weight:600}
+tbody td{padding:.85rem 1rem;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(0,0,0,.02)}
+.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .6rem;border-radius:20px;font-size:.72rem;font-weight:600}
+.badge-green{background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.25);color:var(--green)}
+.badge-red{background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);color:var(--red)}
+.badge-blue{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.25);color:var(--blue)}
+.badge-yellow{background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.25);color:var(--yellow)}
+.mono{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--muted2)}
 
-        .card.highlight {
-            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
-            border-left: 4px solid var(--brand-accent);
-        }
+/* LOGS */
+.log-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:'DM Mono',monospace;font-size:.78rem;height:200px;overflow-y:auto;color:var(--muted2)}
+.log-entry{padding:.2rem 0;border-bottom:1px solid var(--border);line-height:1.5}
+.log-success{color:var(--green)}
+.log-fail{color:var(--red)}
 
-        .grid-dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
+/* TOAST */
+#toast{position:fixed;bottom:2rem;right:2rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem}
+.toast-item{background:var(--surface);border:1px solid var(--border2);padding:.9rem 1.2rem;border-radius:10px;font-size:.875rem;max-width:320px;animation:toastIn .3s ease;box-shadow:0 8px 24px rgba(0,0,0,.12);color:var(--text)}
+.toast-item.success{border-left:3px solid var(--green)}
+.toast-item.error{border-left:3px solid var(--red)}
+.toast-item.info{border-left:3px solid var(--blue)}
+@keyframes toastIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 
-        input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--ui-border);
-            background-color: #020617;
-            color: var(--text-main);
-            margin-bottom: 1rem;
-        }
+/* ALERTS */
+.alert{padding:.75rem 1rem;border-radius:8px;font-size:.85rem;margin-bottom:1rem}
+.alert-info{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:var(--blue)}
 
-        .btn {
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            border-radius: var(--radius-md);
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            transition: 0.2s;
-        }
+/* EMPTY STATE */
+.empty{text-align:center;padding:3rem 1rem;color:var(--muted2)}
+.empty-icon{font-size:2.5rem;margin-bottom:.75rem}
+.empty p{font-size:.875rem}
 
-        .btn-primary { background-color: var(--brand-primary); color: white; }
-        .btn-danger { background-color: transparent; border: 1px solid var(--status-danger); color: var(--status-danger); }
-        .btn-danger:hover { background-color: var(--status-danger); color: white; }
+/* SECTION TABS */
+.section-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem}
+.stab{padding:.5rem 1rem;border-radius:6px;font-size:.85rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted2);transition:.15s}
+.stab.active{background:var(--surface2);color:var(--text);border-color:var(--border2)}
 
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th { text-align: left; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; padding: 1rem; border-bottom: 1px solid var(--ui-border); }
-        td { padding: 1rem; border-bottom: 1px solid var(--ui-border); font-size: 0.9rem; }
-
-        #login-wrapper { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            width: 100vw;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background: var(--ui-bg);
-            z-index: 9999;
-        }
-    </style>
+/* REQUESTS */
+.req-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem}.req-actions{display:flex;gap:.5rem}
+.btn-sm{padding:.4rem .8rem;font-size:.78rem;font-weight:600;border-radius:6px;border:none;cursor:pointer;font-family:inherit}
+.btn-accept{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green)}
+.btn-accept:hover{background:var(--green);color:#fff}
+.btn-decline{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:var(--red)}
+.btn-decline:hover{background:var(--red);color:#fff}
+</style>
 </head>
 <body>
 
-<div id="login-wrapper">
-    <div class="card" style="max-width: 400px; width: 90%; text-align: center;">
-        <div style="background: var(--brand-accent); width: 50px; height: 50px; border-radius: 12px; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem; color: white;">C</div>
-        <h2 style="margin-bottom: 1rem;">CampusCash</h2>
-        <p style="color: var(--text-muted); margin-bottom: 2rem;">Sign in to your student portal</p>
-        <input type="text" id="login-id" placeholder="Email or Student ID">
-        <input type="password" id="login-pass" placeholder="Password">
-        <button onclick="app.login()" class="btn btn-primary">Sign In</button>
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="logo-icon">CC</div>
+      <div>
+        <h2>CampusCash</h2>
+        <p style="font-size:.78rem;color:var(--muted2)">Student Money Transfer</p>
+      </div>
     </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="app.switchAuthTab('signin')">Sign In</button>
+      <button class="auth-tab" onclick="app.switchAuthTab('signup')">Sign Up</button>
+    </div>
+    <div id="auth-error" class="auth-error hidden"></div>
+
+    <!-- SIGN IN -->
+    <div id="signin-form">
+      <label>Email or Student ID</label>
+      <input class="inp" id="si-id" placeholder="alice@campus.com or STU001">
+      <label>Password</label>
+      <input class="inp" id="si-pass" type="password" placeholder="••••••••">
+      <button class="btn btn-primary" onclick="app.login()">Sign In</button>
+    </div>
+
+    <!-- SIGN UP -->
+    <div id="signup-form" class="hidden">
+      <div class="form-row">
+        <div><label>Full Name</label><input class="inp" id="su-name" placeholder="Alice Johnson"></div>
+        <div><label>Student ID</label><input class="inp" id="su-sid" placeholder="STU004"></div>
+      </div>
+      <label>Email</label>
+      <input class="inp" id="su-email" placeholder="student@campus.com">
+      <label>Password</label>
+      <input class="inp" id="su-pass" type="password" placeholder="Min 6 characters">
+      <label>Confirm Password</label>
+      <input class="inp" id="su-pass2" type="password" placeholder="Re-enter password">
+      <button class="btn btn-primary" onclick="app.signup()">Create Account</button>
+      <p style="text-align:center;font-size:.78rem;color:var(--muted2);margin-top:1rem">New accounts start with $100.00 bonus</p>
+    </div>
+  </div>
 </div>
 
-<div id="main-application" class="hidden">
-    <nav id="navbar">
-        <div>
-            <h3 style="color: var(--brand-accent); margin-bottom: 2rem;">CampusCash</h3>
-            <div id="nav-info">
-                <p id="user-display-name" style="font-weight: 600;"></p>
-                <p id="user-display-role" style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;"></p>
-            </div>
-        </div>
-        <button onclick="app.logout()" class="btn btn-danger">Logout</button>
-    </nav>
-
-    <main id="content-area">
-        <section id="student-dashboard" class="hidden">
-            <h2 style="margin-bottom: 1.5rem;">My Finances</h2>
-            <div class="grid-dashboard">
-                <div class="card">
-                    <h3>Send Money</h3>
-                    <input type="email" id="transfer-email" placeholder="Receiver Email">
-                    <input type="number" id="transfer-amount" placeholder="Amount ($)">
-                    <button onclick="app.handleTransfer()" class="btn btn-primary">Transfer Now</button>
-                </div>
-                <div class="card highlight">
-                    <p style="color: var(--text-muted)">Current Balance</p>
-                    <h1 id="display-balance" style="font-size: 2.5rem; margin: 0.5rem 0;">$0.00</h1>
-                    <p>Total Received: <span id="display-total-received" style="color: var(--status-success)">$0.00</span></p>
-                </div>
-            </div>
-            <div class="card" style="margin-top: 1.5rem;">
-                <h3>Transaction Activity</h3>
-                <table>
-                    <thead><tr><th>Type & Party</th><th>Amount</th><th>Timestamp</th></tr></thead>
-                    <tbody id="receiver-table-body"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="admin-dashboard" class="hidden">
-            <h2 style="margin-bottom: 1.5rem;">System Admin</h2>
-            <div class="grid-dashboard">
-                <div class="card">
-                    <p style="color: var(--text-muted)">Revenue (Fees)</p>
-                    <h1 id="admin-total-fees" style="color: var(--brand-primary)">$0.00</h1>
-                </div>
-                <div class="card">
-                    <p style="color: var(--text-muted)">Active Users</p>
-                    <h1 id="admin-user-count">0</h1>
-                </div>
-            </div>
-            <div class="card" style="margin-top: 1.5rem">
-                <h3>System Transaction Ledger</h3>
-                <table>
-                    <thead><tr><th>ID</th><th>Sender</th><th>Receiver</th><th>Amount</th><th>Fee</th></tr></thead>
-                    <tbody id="admin-tx-table-body"></tbody>
-                </table>
-            </div>
-            <div class="card" style="margin-top: 1.5rem; background: #020617;">
-                <h3>Audit Logs</h3>
-                <div id="admin-logs" style="font-family: monospace; font-size: 0.8rem; height: 150px; overflow-y: auto; color: var(--text-muted); margin-top: 10px;"></div>
-            </div>
-        </section>
-    </main>
+<!-- MAIN APP -->
+<div id="app-shell" class="hidden">
+  <nav id="sidebar">
+    <div>
+      <div class="sidebar-logo">
+        <div class="logo-icon">CC</div>
+        <span>CampusCash</span>
+      </div>
+      <div class="user-card">
+        <div class="user-avatar" id="s-avatar"></div>
+        <div class="user-name" id="s-name"></div>
+        <span class="user-role" id="s-role"></span>
+      </div>
+      <div class="nav-links" id="nav-links"></div>
+    </div>
+    <button class="btn btn-danger" onclick="app.logout()">← Sign Out</button>
+  </nav>
+  <main id="main">
+    <!-- pages injected here -->
+    <div id="page-dashboard"></div>
+    <div id="page-send" class="hidden"></div>
+    <div id="page-receive" class="hidden"></div>
+    <div id="page-requests" class="hidden"></div>
+    <div id="page-admin" class="hidden"></div>
+  </main>
 </div>
+
+<div id="toast"></div>
 
 <script>
-class CampusCashApp {
-    constructor() {
-        this.initializeData();
-        this.render();
+class CampusCash {
+  constructor(){
+    this.currentPage = 'dashboard';
+    this.authTab = 'signin';
+    this.init();
+  }
+
+  init(){
+    const saved = localStorage.getItem('cc_db');
+    this.db = saved ? JSON.parse(saved) : this.defaultDb();
+    if(this.db.session){
+      this.renderApp();
+    } else {
+      document.getElementById('auth-screen').classList.remove('hidden');
+      document.getElementById('app-shell').classList.add('hidden');
+    }
+  }
+
+  defaultDb(){
+    return {
+      session: null,
+      users:[
+        {id:'ADMIN001',name:'Admin User',email:'admin@campus.com',password:'admin123',role:'admin',balance:0},
+        {id:'STU001',name:'Alice Johnson',email:'alice@campus.com',password:'alice123',role:'student',balance:250},
+        {id:'STU002',name:'Bob Smith',email:'bob@campus.com',password:'bob123',role:'student',balance:80},
+        {id:'STU003',name:'Carol Davis',email:'carol@campus.com',password:'carol123',role:'student',balance:150}
+      ],
+      transactions:[],
+      logs:[],
+      requests:[]
+    };
+  }
+
+  save(){ localStorage.setItem('cc_db', JSON.stringify(this.db)); }
+
+  log(userId, action, details, status){
+    this.db.logs.unshift({ts:new Date().toLocaleString(),userId,action,details,status});
+    this.save();
+  }
+
+  calcFee(amount){
+    if(amount<=10) return 0.50;
+    if(amount<=50) return amount*0.05;
+    if(amount<=200) return amount*0.04;
+    return Math.min(amount*0.03, 15);
+  }
+
+  showToast(msg, type='info'){
+    const t = document.getElementById('toast');
+    const d = document.createElement('div');
+    d.className = `toast-item ${type}`;
+    d.innerHTML = msg;
+    t.appendChild(d);
+    setTimeout(()=>d.remove(), 4000);
+  }
+
+  showError(msg){
+    const e = document.getElementById('auth-error');
+    e.textContent = msg;
+    e.classList.remove('hidden');
+  }
+  hideError(){ document.getElementById('auth-error').classList.add('hidden'); }
+
+  switchAuthTab(tab){
+    this.authTab = tab;
+    this.hideError();
+    document.querySelectorAll('.auth-tab').forEach((b,i)=>{
+      b.classList.toggle('active', (i===0&&tab==='signin')||(i===1&&tab==='signup'));
+    });
+    document.getElementById('signin-form').classList.toggle('hidden', tab!=='signin');
+    document.getElementById('signup-form').classList.toggle('hidden', tab!=='signup');
+  }
+
+  login(){
+    this.hideError();
+    const id = document.getElementById('si-id').value.trim();
+    const pass = document.getElementById('si-pass').value;
+    const user = this.db.users.find(u=>(u.email===id||u.id===id)&&u.password===pass);
+    if(!user){ this.showError('Invalid credentials. Please try again.'); return; }
+    this.db.session = user.id;
+    this.log(user.id,'LOGIN','User logged in','Success');
+    this.save();
+    this.renderApp();
+  }
+
+  signup(){
+    this.hideError();
+    const name = document.getElementById('su-name').value.trim();
+    const sid = document.getElementById('su-sid').value.trim().toUpperCase();
+    const email = document.getElementById('su-email').value.trim().toLowerCase();
+    const pass = document.getElementById('su-pass').value;
+    const pass2 = document.getElementById('su-pass2').value;
+
+    if(!name||!sid||!email||!pass) return this.showError('All fields are required.');
+    if(pass.length < 6) return this.showError('Password must be at least 6 characters.');
+    if(pass !== pass2) return this.showError('Passwords do not match.');
+    if(this.db.users.find(u=>u.email===email)) return this.showError('Email already registered.');
+    if(this.db.users.find(u=>u.id===sid)) return this.showError('Student ID already in use.');
+    if(!email.includes('@')) return this.showError('Enter a valid email address.');
+
+    const newUser={id:sid,name,email,password:pass,role:'student',balance:100};
+    this.db.users.push(newUser);
+    this.db.session = sid;
+    this.log(sid,'SIGNUP',`New student registered: ${name}`,'Success');
+    this.save();
+    this.renderApp();
+    this.showToast(`Welcome, ${name}! You received $100.00 signup bonus.`,'success');
+  }
+
+  logout(){
+    const uid = this.db.session;
+    this.log(uid,'LOGOUT','User logged out','Success');
+    this.db.session = null;
+    this.save();
+    document.getElementById('app-shell').classList.add('hidden');
+    document.getElementById('auth-screen').classList.remove('hidden');
+    document.getElementById('si-id').value='';
+    document.getElementById('si-pass').value='';
+    this.hideError();
+    this.switchAuthTab('signin');
+  }
+
+  get currentUser(){ return this.db.users.find(u=>u.id===this.db.session); }
+
+  renderApp(){
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('app-shell').classList.remove('hidden');
+    const u = this.currentUser;
+    const initials = u.name.split(' ').map(n=>n[0]).join('').slice(0,2);
+    document.getElementById('s-avatar').textContent = initials;
+    document.getElementById('s-name').textContent = u.name;
+    document.getElementById('s-role').textContent = u.role;
+
+    const navLinks = document.getElementById('nav-links');
+    if(u.role==='admin'){
+      navLinks.innerHTML = `
+        <button class="nav-link" onclick="app.goto('admin')"><span class="nav-icon">⚡</span>Admin Panel</button>`;
+    } else {
+      navLinks.innerHTML = `
+        <button class="nav-link" onclick="app.goto('dashboard')"><span class="nav-icon">◈</span>Dashboard</button>
+        <button class="nav-link" onclick="app.goto('send')"><span class="nav-icon">↑</span>Send Money</button>
+        <button class="nav-link" onclick="app.goto('receive')"><span class="nav-icon">↓</span>Receive View</button>
+        <button class="nav-link" onclick="app.goto('requests')"><span class="nav-icon">⇄</span>Requests</button>`;
+    }
+    this.goto(u.role==='admin'?'admin':'dashboard');
+  }
+
+  goto(page){
+    this.currentPage = page;
+    ['dashboard','send','receive','requests','admin'].forEach(p=>{
+      document.getElementById(`page-${p}`).classList.add('hidden');
+    });
+    document.getElementById(`page-${page}`).classList.remove('hidden');
+    document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(l=>{
+      if(l.textContent.trim().toLowerCase().includes(page==='dashboard'?'dashboard':page==='send'?'send':page==='receive'?'receive':page==='requests'?'request':page)) l.classList.add('active');
+    });
+    const fn = `render_${page}`;
+    if(this[fn]) this[fn]();
+  }
+
+  render_dashboard(){
+    const u = this.currentUser;
+    const txs = this.db.transactions;
+    const myTxs = txs.filter(t=>t.senderId===u.id||t.receiverId===u.id).slice(-5).reverse();
+    const totalRecv = txs.filter(t=>t.receiverId===u.id).reduce((s,t)=>s+t.amount,0);
+    const totalSent = txs.filter(t=>t.senderId===u.id).reduce((s,t)=>s+t.amount,0);
+
+    document.getElementById('page-dashboard').innerHTML=`
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>Welcome back, ${u.name.split(' ')[0]}! Here's your financial overview.</p>
+      </div>
+      <div class="grid3" style="margin-bottom:1.5rem">
+        <div class="balance-card">
+          <div class="card-title" style="color:rgba(255,255,255,.7)">Current Balance</div>
+          <div class="balance-amount">$${u.balance.toFixed(2)}</div>
+          <span class="balance-chip">✓ Available</span>
+        </div>
+        <div class="card card-accent-green">
+          <div class="card-title">Total Received</div>
+          <div class="stat-value" style="color:var(--green)">$${totalRecv.toFixed(2)}</div>
+          <div class="stat-label">${txs.filter(t=>t.receiverId===u.id).length} transaction(s)</div>
+        </div>
+        <div class="card card-accent-blue">
+          <div class="card-title">Total Sent</div>
+          <div class="stat-value" style="color:var(--blue)">$${totalSent.toFixed(2)}</div>
+          <div class="stat-label">${txs.filter(t=>t.senderId===u.id).length} transfer(s)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Recent Activity</div>
+        <div class="table-wrap">
+          ${myTxs.length===0?`<div class="empty"><div class="empty-icon">📭</div><p>No transactions yet.</p></div>`:`
+          <table><thead><tr><th>Type</th><th>Party</th><th>Amount</th><th>Date</th></tr></thead><tbody>
+          ${myTxs.map(t=>{
+            const isSent = t.senderId===u.id;
+            const party = isSent ? t.receiverName : t.senderName;
+            return `<tr>
+              <td><span class="badge ${isSent?'badge-red':'badge-green'}">${isSent?'↑ Sent':'↓ Received'}</span></td>
+              <td>${party}</td>
+              <td style="font-family:'DM Mono',monospace;font-weight:600;color:${isSent?'var(--red)':'var(--green)'}">
+                ${isSent?'-':'+'}$${t.amount.toFixed(2)}</td>
+              <td style="color:var(--muted2);font-size:.8rem">${t.ts}</td>
+            </tr>`;
+          }).join('')}
+          </tbody></table>`}
+        </div>
+      </div>`;
+  }
+
+  render_send(){
+    document.getElementById('page-send').innerHTML=`
+      <div class="page-header">
+        <h1>Send Money</h1>
+        <p>Transfer funds securely to any student.</p>
+      </div>
+      <div class="grid3">
+        <div class="card" style="grid-column:span 2">
+          <div class="card-title">Transfer Details</div>
+          <div class="transfer-form" style="margin-top:.5rem">
+            <div><label>Recipient Email</label>
+            <input class="inp" id="tr-email" placeholder="recipient@campus.com" oninput="app.previewFee()"></div>
+            <div><label>Amount ($)</label>
+            <input class="inp" id="tr-amt" type="number" min="1" placeholder="Enter amount" oninput="app.previewFee()"></div>
+            <div class="fee-preview" id="fee-preview">
+              <div style="color:var(--muted);font-size:.8rem;text-align:center">Enter an amount to preview fees</div>
+            </div>
+            <div id="transfer-result" style="display:none;padding:.85rem 1rem;border-radius:8px;font-size:.875rem;margin-top:.25rem"></div>
+            <button class="btn btn-primary" onclick="app.doTransfer()">Send Money →</button>
+          </div>
+        </div>
+        <div>
+          <div class="balance-card" style="margin-bottom:1rem">
+            <div class="card-title" style="color:rgba(255,255,255,.7)">Your Balance</div>
+            <div class="balance-amount">$${this.currentUser.balance.toFixed(2)}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Fee Schedule</div>
+            <table style="font-size:.8rem">
+              <tr><td style="padding:.4rem 0;color:var(--muted2)">Up to $10</td><td style="text-align:right;font-family:'DM Mono',monospace">$0.50 flat</td></tr>
+              <tr><td style="padding:.4rem 0;color:var(--muted2)">$10.01–$50</td><td style="text-align:right;font-family:'DM Mono',monospace">5%</td></tr>
+              <tr><td style="padding:.4rem 0;color:var(--muted2)">$50.01–$200</td><td style="text-align:right;font-family:'DM Mono',monospace">4%</td></tr>
+              <tr><td style="padding:.4rem 0;color:var(--muted2)">Above $200</td><td style="text-align:right;font-family:'DM Mono',monospace">3% (max $15)</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  previewFee(){
+    const amt = parseFloat(document.getElementById('tr-amt').value);
+    const box = document.getElementById('fee-preview');
+    if(isNaN(amt)||amt<=0){
+      box.innerHTML=`<div style="color:var(--muted);font-size:.8rem;text-align:center">Enter an amount to preview fees</div>`;
+      return;
+    }
+    const fee = this.calcFee(amt);
+    const total = amt + fee;
+    box.innerHTML=`
+      <div class="fee-row"><span>Amount</span><span>$${amt.toFixed(2)}</span></div>
+      <div class="fee-row"><span>Service Fee</span><span>$${fee.toFixed(2)}</span></div>
+      <div class="fee-row"><span>Total Deducted</span><span>$${total.toFixed(2)}</span></div>`;
+  }
+
+  showResult(msg, type){
+    const el = document.getElementById('transfer-result');
+    if(!el) return;
+    el.style.display = 'block';
+    el.style.background = type==='error' ? 'rgba(220,38,38,.08)' : 'rgba(5,150,105,.08)';
+    el.style.border = type==='error' ? '1px solid rgba(220,38,38,.3)' : '1px solid rgba(5,150,105,.3)';
+    el.style.color = type==='error' ? 'var(--red)' : 'var(--green)';
+    el.innerHTML = msg;
+  }
+
+  failedTransfer(sender, email, amount, reason){
+    this.db.transactions.push({
+      id:`FAIL-${Date.now().toString().slice(-5)}`,
+      senderId:sender.id, senderName:sender.name,
+      receiverId:'N/A', receiverName: email||'N/A',
+      amount: isNaN(amount)?0:amount,
+      fee:0, total:0,
+      status:'Failed',
+      reason: reason,
+      ts:new Date().toLocaleString()
+    });
+    this.log(sender.id,'TRANSFER_FAIL', reason,'Failure');
+    this.save();
+  }
+
+  doTransfer(){
+    const email = document.getElementById('tr-email').value.trim().toLowerCase();
+    const amount = parseFloat(document.getElementById('tr-amt').value);
+    const sender = this.currentUser;
+    const receiver = this.db.users.find(u=>u.email===email);
+
+    if(isNaN(amount)||amount<1){
+      this.showResult('❌ Minimum transfer amount is $1.00', 'error');
+      this.showToast('Minimum transfer amount is $1.00','error');
+      this.failedTransfer(sender, email, amount, 'Amount below minimum ($1.00)');
+      return;
+    }
+    if(!receiver){
+      this.showResult(`❌ Receiver not found: <strong>${email}</strong> is not registered.`, 'error');
+      this.showToast('Receiver not found. Check the email address.','error');
+      this.failedTransfer(sender, email, amount, `Receiver not found: ${email}`);
+      return;
+    }
+    if(receiver.id===sender.id){
+      this.showResult('❌ You cannot send money to yourself.', 'error');
+      this.showToast('You cannot send money to yourself.','error');
+      this.failedTransfer(sender, email, amount, 'Self-transfer attempt');
+      return;
     }
 
-    initializeData() {
-        const savedData = JSON.parse(localStorage.getItem('campusCash_db'));
-        this.state = savedData || {
-            users: [
-                { name: "Admin User", email: "admin@campus.com", id: "ADMIN001", password: "admin123", role: "admin", balance: 0 },
-                { name: "Alice Johnson", email: "alice@campus.com", id: "STU001", password: "alice123", role: "student", balance: 250 },
-                { name: "Bob Smith", email: "bob@campus.com", id: "STU002", password: "bob123", role: "student", balance: 80 },
-                { name: "Carol Davis", email: "carol@campus.com", id: "STU003", password: "carol123", role: "student", balance: 150 }
-            ],
-            transactions: [],
-            logs: [],
-            currentUser: null
-        };
+    const fee = this.calcFee(amount);
+    const total = amount + fee;
+
+    if(sender.balance < total){
+      this.showResult(`❌ Insufficient balance. You need <strong>$${total.toFixed(2)}</strong> but only have <strong>$${sender.balance.toFixed(2)}</strong>.`, 'error');
+      this.showToast(`Insufficient balance. You need $${total.toFixed(2)} but have $${sender.balance.toFixed(2)}.`,'error');
+      this.failedTransfer(sender, email, amount, `Insufficient balance — needed $${total.toFixed(2)}, had $${sender.balance.toFixed(2)}`);
+      return;
     }
 
-    save() { localStorage.setItem('campusCash_db', JSON.stringify(this.state)); }
+    // Update balances in DB
+    const sIdx = this.db.users.findIndex(u=>u.id===sender.id);
+    const rIdx = this.db.users.findIndex(u=>u.id===receiver.id);
+    this.db.users[sIdx].balance = parseFloat((this.db.users[sIdx].balance - total).toFixed(2));
+    this.db.users[rIdx].balance = parseFloat((this.db.users[rIdx].balance + amount).toFixed(2));
 
-    log(userId, action, details, status) {
-        this.state.logs.unshift({ timestamp: new Date().toLocaleString(), userId, action, details, status });
-        this.save();
+    const txId = `TXN-${Date.now().toString().slice(-5)}`;
+    this.db.transactions.push({
+      id:txId,
+      senderId:sender.id, senderName:sender.name,
+      receiverId:receiver.id, receiverName:receiver.name,
+      amount, fee,
+      total,
+      status:'Success',
+      ts:new Date().toLocaleString()
+    });
+
+    this.log(sender.id,'TRANSFER',`Sent $${amount.toFixed(2)} to ${receiver.name}, fee $${fee.toFixed(2)}`,'Success');
+    this.log(receiver.id,'RECEIVED',`Received $${amount.toFixed(2)} from ${sender.name}`,'Success');
+    this.save();
+
+    this.showToast(`✓ Sent $${amount.toFixed(2)} to ${receiver.name}<br><small>Fee: $${fee.toFixed(2)} | Total: $${total.toFixed(2)}</small>`, 'success');
+    this.render_send();
+    // Show success summary inline after re-render
+    this.showResult(`
+      ✅ <strong>Transfer Successful!</strong><br>
+      You sent <strong>$${amount.toFixed(2)}</strong> to <strong>${receiver.name}</strong><br>
+      Service fee charged: <strong>$${fee.toFixed(2)}</strong><br>
+      Total deducted: <strong>$${total.toFixed(2)}</strong><br>
+      Your new balance: <strong>$${this.currentUser.balance.toFixed(2)}</strong>
+    `, 'success');
+  }
+
+  render_receive(){
+    const u = this.currentUser;
+    const txs = this.db.transactions;
+    const incoming = txs.filter(t=>t.receiverId===u.id);
+    const total = incoming.reduce((s,t)=>s+t.amount,0);
+
+    document.getElementById('page-receive').innerHTML=`
+      <div class="page-header">
+        <h1>Receive View</h1>
+        <p>All incoming transactions to your account.</p>
+      </div>
+      <div class="grid2" style="margin-bottom:1.5rem">
+        <div class="balance-card">
+          <div class="card-title" style="color:rgba(255,255,255,.7)">Current Balance</div>
+          <div class="balance-amount">$${u.balance.toFixed(2)}</div>
+        </div>
+        <div class="card card-accent-green">
+          <div class="card-title">Total Received (All Time)</div>
+          <div class="stat-value" style="color:var(--green)">$${total.toFixed(2)}</div>
+          <div class="stat-label">${incoming.length} incoming transaction(s)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Incoming Transactions</div>
+        <div class="table-wrap">
+          ${incoming.length===0?`<div class="empty"><div class="empty-icon">📭</div><p>No incoming transactions yet.</p></div>`:`
+          <table><thead><tr><th>From</th><th>Amount Received</th><th>Date & Time</th></tr></thead><tbody>
+          ${[...incoming].reverse().map(t=>`<tr>
+            <td><strong>${t.senderName}</strong><br><span class="mono">${t.senderId}</span></td>
+            <td style="color:var(--green);font-family:'DM Mono',monospace;font-weight:700">+$${t.amount.toFixed(2)}</td>
+            <td style="color:var(--muted2);font-size:.8rem">${t.ts}</td>
+          </tr>`).join('')}
+          </tbody></table>`}
+        </div>
+      </div>`;
+  }
+
+  render_requests(){
+    const u = this.currentUser;
+    const myRequests = this.db.requests;
+    const sent = myRequests.filter(r=>r.fromId===u.id);
+    const received = myRequests.filter(r=>r.toId===u.id&&r.status==='pending');
+
+    document.getElementById('page-requests').innerHTML=`
+      <div class="page-header">
+        <h1>Money Requests</h1>
+        <p>Request money from other students.</p>
+      </div>
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card-title">New Request</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:1rem;align-items:end;margin-top:.5rem">
+          <div><label>Request From (Email)</label><input class="inp" id="rq-email" placeholder="student@campus.com" style="margin-bottom:0"></div>
+          <div><label>Amount ($)</label><input class="inp" id="rq-amt" type="number" min="1" placeholder="Amount" style="margin-bottom:0"></div>
+          <button class="btn btn-primary" style="width:auto;padding:.7rem 1.5rem" onclick="app.sendRequest()">Send Request</button>
+        </div>
+      </div>
+      ${received.length>0?`
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card-title">Pending Requests For You (${received.length})</div>
+        <div style="margin-top:.75rem">
+          ${received.map(r=>`
+          <div class="req-card">
+            <div>
+              <strong>${r.fromName}</strong> is requesting <strong style="color:var(--blue)">$${r.amount.toFixed(2)}</strong>
+              <div style="font-size:.78rem;color:var(--muted2);margin-top:.2rem">${r.ts}</div>
+            </div>
+            <div class="req-actions">
+              <button class="btn-sm btn-accept" onclick="app.handleRequest('${r.id}','accept')">Accept</button>
+              <button class="btn-sm btn-decline" onclick="app.handleRequest('${r.id}','decline')">Decline</button>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>`:''}
+      <div class="card">
+        <div class="card-title">My Sent Requests</div>
+        <div class="table-wrap">
+          ${sent.length===0?`<div class="empty"><div class="empty-icon">📨</div><p>No requests sent yet.</p></div>`:`
+          <table><thead><tr><th>To</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody>
+          ${[...sent].reverse().map(r=>`<tr>
+            <td>${r.toName}</td>
+            <td class="mono">$${r.amount.toFixed(2)}</td>
+            <td><span class="badge ${r.status==='pending'?'badge-yellow':r.status==='accepted'?'badge-green':'badge-red'}">${r.status}</span></td>
+            <td style="color:var(--muted2);font-size:.8rem">${r.ts}</td>
+          </tr>`).join('')}
+          </tbody></table>`}
+        </div>
+      </div>`;
+  }
+
+  sendRequest(){
+    const email = document.getElementById('rq-email').value.trim().toLowerCase();
+    const amount = parseFloat(document.getElementById('rq-amt').value);
+    const u = this.currentUser;
+    const target = this.db.users.find(x=>x.email===email);
+    if(!target){this.showToast('User not found','error');return;}
+    if(target.id===u.id){this.showToast('Cannot request from yourself','error');return;}
+    if(isNaN(amount)||amount<1){this.showToast('Minimum $1.00','error');return;}
+    this.db.requests.push({
+      id:`REQ-${Date.now()}`,
+      fromId:u.id, fromName:u.name,
+      toId:target.id, toName:target.name,
+      amount, status:'pending', ts:new Date().toLocaleString()
+    });
+    this.log(u.id,'REQUEST',`Requested $${amount.toFixed(2)} from ${target.name}`,'Success');
+    this.save();
+    this.showToast(`Request sent to ${target.name}`,'success');
+    this.render_requests();
+  }
+
+  handleRequest(reqId, action){
+    const idx = this.db.requests.findIndex(r=>r.id===reqId);
+    if(idx===-1) return;
+    const req = this.db.requests[idx];
+    const u = this.currentUser;
+    if(action==='accept'){
+      // Do a real transfer from accepter to requester
+      const fee = this.calcFee(req.amount);
+      const total = req.amount + fee;
+      if(u.balance < total){
+        this.showToast(`Insufficient balance to accept. Need $${total.toFixed(2)}`,'error');
+        return;
+      }
+      const sIdx = this.db.users.findIndex(x=>x.id===u.id);
+      const rIdx = this.db.users.findIndex(x=>x.id===req.fromId);
+      this.db.users[sIdx].balance = parseFloat((this.db.users[sIdx].balance - total).toFixed(2));
+      this.db.users[rIdx].balance = parseFloat((this.db.users[rIdx].balance + req.amount).toFixed(2));
+      this.db.transactions.push({
+        id:`TXN-${Date.now().toString().slice(-5)}`,
+        senderId:u.id, senderName:u.name,
+        receiverId:req.fromId, receiverName:req.fromName,
+        amount:req.amount, fee, total:total, status:'Success',
+        ts:new Date().toLocaleString()
+      });
+      this.db.requests[idx].status='accepted';
+      this.log(u.id,'REQUEST_ACCEPTED',`Accepted request from ${req.fromName} for $${req.amount}`,'Success');
+      this.showToast(`Accepted! Sent $${req.amount.toFixed(2)} to ${req.fromName}`,'success');
+    } else {
+      this.db.requests[idx].status='declined';
+      this.log(u.id,'REQUEST_DECLINED',`Declined request from ${req.fromName}`,'Success');
+      this.showToast(`Declined request from ${req.fromName}`,'info');
     }
+    this.save();
+    this.render_requests();
+  }
 
-    login() {
-        const id = document.getElementById('login-id').value;
-        const pass = document.getElementById('login-pass').value;
-        const user = this.state.users.find(u => (u.email === id || u.id === id) && u.password === pass);
-        if (user) {
-            this.state.currentUser = user;
-            this.log(user.id, "LOGIN", "Success", "Success");
-            this.render();
-        } else {
-            alert("Invalid Credentials");
-        }
-    }
+  render_admin(){
+    const {transactions:txs, users, logs} = this.db;
+    const successTxs = txs.filter(t=>t.status==='Success');
+    const failedTxs  = txs.filter(t=>t.status==='Failed');
+    const totalFees  = successTxs.reduce((s,t)=>s+t.fee,0);
+    const students   = users.filter(u=>u.role==='student');
+    const allFailedLogs = logs.filter(l=>l.status==='Failure');
 
-    logout() {
-        this.state.currentUser = null;
-        document.getElementById('login-id').value = '';
-        document.getElementById('login-pass').value = '';
-        this.render();
-    }
+    document.getElementById('page-admin').innerHTML=`
+      <div class="page-header">
+        <h1>System Admin Panel</h1>
+        <p>Full system overview and transaction ledger.</p>
+      </div>
 
-    handleTransfer() {
-        const email = document.getElementById('transfer-email').value;
-        const amount = parseFloat(document.getElementById('transfer-amount').value);
-        const sender = this.state.currentUser;
-        const receiver = this.state.users.find(u => u.email === email);
-        
-        const fee = (amount <= 10) ? 0.5 : (amount <= 50) ? amount * 0.05 : (amount <= 200) ? amount * 0.04 : Math.min(amount * 0.03, 15);
-        const total = amount + fee;
+      <div class="grid2" style="margin-bottom:1.5rem">
+        <div class="card card-accent-blue">
+          <div class="card-title">Platform Revenue (Fees)</div>
+          <div class="stat-value" style="color:var(--blue)">$${totalFees.toFixed(2)}</div>
+          <div class="stat-label">From ${successTxs.length} successful transactions</div>
+        </div>
+        <div class="card card-accent-purple">
+          <div class="card-title">Active Students</div>
+          <div class="stat-value" style="color:var(--purple)">${students.length}</div>
+          <div class="stat-label">${failedTxs.length} failed transaction(s) logged</div>
+        </div>
+      </div>
 
-        if (isNaN(amount) || amount < 1 || !receiver || receiver.email === sender.email || sender.balance < total) {
-            alert("Transfer failed. Check balance/recipient.");
-            this.log(sender.id, "TRANSFER_FAIL", "Invalid Input", "Failure");
-            return;
-        }
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card-title">All Users & Current Balances</div>
+        <div class="table-wrap">
+          <table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Balance</th></tr></thead><tbody>
+          ${users.map(u=>`<tr>
+            <td class="mono">${u.id}</td>
+            <td><strong>${u.name}</strong></td>
+            <td style="color:var(--muted2)">${u.email}</td>
+            <td><span class="badge ${u.role==='admin'?'badge-purple':'badge-blue'}">${u.role}</span></td>
+            <td style="font-family:'DM Mono',monospace;font-weight:600;color:${u.role==='admin'?'var(--muted2)':'var(--green)'}">${u.role==='admin'?'N/A':'$'+u.balance.toFixed(2)}</td>
+          </tr>`).join('')}
+          </tbody></table>
+        </div>
+      </div>
 
-        sender.balance -= total;
-        receiver.balance += amount;
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card-title">All Transactions (${txs.length})</div>
+        <div class="table-wrap">
+          ${txs.length===0?`<div class="empty"><div class="empty-icon">📊</div><p>No transactions yet.</p></div>`:`
+          <table><thead><tr><th>ID</th><th>Sender</th><th>Receiver</th><th>Amount</th><th>Fee</th><th>Total</th><th>Status</th><th>Date</th></tr></thead><tbody>
+          ${[...txs].reverse().map(t=>`<tr>
+            <td class="mono">${t.id}</td>
+            <td>${t.senderName}<br><span class="mono">${t.senderId}</span></td>
+            <td>${t.receiverName}<br><span class="mono">${t.receiverId}</span></td>
+            <td class="mono">$${t.amount.toFixed(2)}</td>
+            <td style="color:var(--blue);font-family:'DM Mono',monospace">$${t.fee.toFixed(2)}</td>
+            <td class="mono" style="font-weight:600">$${t.total.toFixed(2)}</td>
+            <td><span class="badge badge-green">✓ Success</span></td>
+            <td style="color:var(--muted2);font-size:.78rem">${t.ts}</td>
+          </tr>`).join('')}
+          </tbody></table>`}
+        </div>
+      </div>
 
-        this.state.transactions.push({
-            id: `TXN-${Math.floor(Math.random()*90000)}`,
-            senderName: sender.name, receiverName: receiver.name,
-            amount: amount, fee: fee, timestamp: new Date().toLocaleString()
-        });
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card-title" style="color:var(--red)">⚠ Failed Transactions (${failedTxs.length})</div>
+        <div class="table-wrap">
+          ${failedTxs.length===0
+            ?`<div class="empty"><div class="empty-icon">✅</div><p>No failed transactions recorded.</p></div>`
+            :`<table><thead><tr><th>ID</th><th>Sender</th><th>Attempted To</th><th>Amount</th><th>Reason</th><th>Date</th></tr></thead><tbody>
+            ${[...failedTxs].reverse().map(t=>`<tr>
+              <td class="mono" style="color:var(--red)">${t.id}</td>
+              <td><strong>${t.senderName}</strong><br><span class="mono">${t.senderId}</span></td>
+              <td style="color:var(--muted2)">${t.receiverName}</td>
+              <td class="mono">$${Number(t.amount).toFixed(2)}</td>
+              <td><span class="badge badge-red">${t.reason}</span></td>
+              <td style="color:var(--muted2);font-size:.78rem">${t.ts}</td>
+            </tr>`).join('')}
+            </tbody></table>`}
+        </div>
+      </div>
 
-        this.log(sender.id, "TRANSFER", `Sent $${amount}`, "Success");
-        this.save();
-        this.render();
-        alert("Sent Successfully!");
-        document.getElementById('transfer-email').value = '';
-        document.getElementById('transfer-amount').value = '';
-    }
-
-    render() {
-        const { currentUser, transactions, users, logs } = this.state;
-        const loginWrapper = document.getElementById('login-wrapper');
-        const mainApp = document.getElementById('main-application');
-
-        // Logic fix: Explicit View Toggling
-        if (!currentUser) {
-            loginWrapper.classList.remove('hidden');
-            mainApp.classList.add('hidden');
-            return;
-        } else {
-            loginWrapper.classList.add('hidden');
-            mainApp.classList.remove('hidden');
-        }
-
-        document.getElementById('user-display-name').innerText = currentUser.name;
-        document.getElementById('user-display-role').innerText = currentUser.role;
-        document.getElementById('student-dashboard').classList.toggle('hidden', currentUser.role !== 'student');
-        document.getElementById('admin-dashboard').classList.toggle('hidden', currentUser.role !== 'admin');
-
-        if (currentUser.role === 'student') {
-            document.getElementById('display-balance').innerText = `$${currentUser.balance.toFixed(2)}`;
-            
-            // SUMMARY: Only money coming in
-            const incomingSum = transactions.filter(t => t.receiverName === currentUser.name).reduce((s, t) => s + t.amount, 0);
-            document.getElementById('display-total-received').innerText = `$${incomingSum.toFixed(2)}`;
-            
-            // HISTORY: All activity (Sent AND Received)
-            const myActivity = transactions.filter(t => t.senderName === currentUser.name || t.receiverName === currentUser.name);
-            const tbody = document.getElementById('receiver-table-body');
-            
-            tbody.innerHTML = myActivity.length === 0 
-                ? `<tr><td colspan="3" style="text-align:center; color:var(--text-muted)">No activity yet.</td></tr>`
-                : myActivity.map(t => {
-                    const isSent = t.senderName === currentUser.name;
-                    return `
-                        <tr>
-                            <td>
-                                <strong>${isSent ? 'Sent' : 'Received'}</strong><br>
-                                <small style="color:var(--text-muted)">${isSent ? 'To: '+t.receiverName : 'From: '+t.senderName}</small>
-                            </td>
-                            <td style="color:${isSent ? 'var(--status-danger)' : 'var(--status-success)'}; font-weight:bold;">
-                                ${isSent ? '-' : '+'}$${t.amount.toFixed(2)}
-                            </td>
-                            <td>${t.timestamp}</td>
-                        </tr>`;
-                }).join('');
-        }
-
-        if (currentUser.role === 'admin') {
-            document.getElementById('admin-total-fees').innerText = `$${transactions.reduce((s, t) => s + t.fee, 0).toFixed(2)}`;
-            document.getElementById('admin-user-count').innerText = users.length - 1;
-            document.getElementById('admin-tx-table-body').innerHTML = transactions.map(t => `<tr><td><small>${t.id}</small></td><td>${t.senderName}</td><td>${t.receiverName}</td><td>$${t.amount.toFixed(2)}</td><td style="color:var(--brand-primary)">$${t.fee.toFixed(2)}</td></tr>`).join('');
-            document.getElementById('admin-logs').innerHTML = logs.map(l => `<div>[${l.timestamp}] ${l.userId}: ${l.action} - ${l.status}</div>`).join('');
-        }
-    }
+      <div class="card">
+        <div class="card-title">System Audit Logs (${logs.length})</div>
+        <div class="log-box" id="admin-logs">
+          ${logs.length===0?`<div style="color:var(--muted);text-align:center;padding:1rem">No logs yet.</div>`
+          :logs.map(l=>`<div class="log-entry ${l.status==='Success'?'log-success':l.status==='Failure'?'log-fail':''}">[${l.ts}] ${l.userId} → ${l.action}: ${l.details} <em>(${l.status})</em></div>`).join('')}
+        </div>
+      </div>`;
+  }
 }
-const app = new CampusCashApp();
+
+const app = new CampusCash();
 </script>
 </body>
 </html>
